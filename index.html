@@ -277,12 +277,14 @@ circles.exit().remove();
                   Reveal.addEventListener( 'map1', function() {
                     if(! done.map1){
                       _renderMap('#map1');
+                      Reveal.sync();
                       done.map1 = true;
                     }
                   });
                   Reveal.addEventListener( 'map2', function() {
                     if(! done.map2){
                       var state = _renderMap('#map2');
+                      Reveal.sync();
                       _getLoginsStatic(state);
                       done.map2 = true;
                     }
@@ -290,6 +292,7 @@ circles.exit().remove();
                   Reveal.addEventListener( 'map3', function() {
                     if(! done.map3){
                       var state = _renderMap('#map3');
+                      Reveal.sync();
                       _getLogins(state, 'cities_small.json');
                       done.map3 = true;
                     }
@@ -297,6 +300,7 @@ circles.exit().remove();
                   Reveal.addEventListener( 'map4', function() {
                     if(! done.map4){
                       var state = _renderMap('#map4');
+                      Reveal.sync();
                       _getLogins(state, 'cities.json');
                       done.map4 = true;
                     }
