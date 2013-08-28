@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+
+        <head>
+                <meta charset="utf-8">
+
+                <title>D3 Mapping</title>
+
+                <meta name="description" content="D3 Mapping">
+                <meta name="author" content="Brett Carter">
+
+                <meta name="apple-mobile-web-app-capable" content="yes" />
+                <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+                <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+                <link rel="stylesheet" href="css/reveal.min.css">
+                <link rel="stylesheet" href="css/theme/default.css" id="theme">
+                <link rel="stylesheet" href="style.css">
+
+                <!-- For syntax highlighting -->
+                <link rel="stylesheet" href="lib/css/zenburn.css">
+
+                <!-- If the query includes 'print-pdf', use the PDF print sheet -->
+                <script>
+                        document.write( '<link rel="stylesheet" href="css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+                </script>
+
+                <!--[if lt IE 9]>
+                <script src="lib/js/html5shiv.js"></script>
+                <![endif]-->
+
+        </head>
+
+        <body>
+
+                <div class="reveal">
+
+                        <!-- Any section element inside of this container is displayed as a slide -->
+                        <div class="slides">
+                                <section>
+                                        <h1>D3</h1>
+                                        <h3>Mapping with D3</h3>
+                                        <p>
+                                                <small>Created by <a href="http://rdnzl.net">Brett Carter</a> / <a href="http://twitter.com/zbskii">@zbskii</a></small>
+                                        </p>
+                                </section>
+                                <section>
+                                        <h3>I work at Janrain</h3>
+                                        <p>
+                                          We do cool stuff.  Mostly logins.
+                                        </p>
+                                </section>
+                                <section>
+                                        <h3>Background</h3>
+                                        <p>
+                                          I mostly do backend work.  Databases, servers, DevOps, etc.
+                                        </p>
+                                </section>
+                                <section>
+                                        <h3>Background</h3>
+                                        <p class="fragment">
+                                          I'm not a JavaScript programmer :)
+                                        </p>
+                                        <p class="fragment">
+                                          Ugh...
+                                        </p>
+
+                                </section>
+                                <section>
+                                        <h3>So once there was a hackathon at work</h3>
+                                        <p>
+                                          I wanted to make something <marquee>cool</marquee>
+                                        </p>
+                                </section>
+                                <section>
+                                        <h3>Let's build a dashboard!</h3>
+                                        <p>
+                                          <img src="7367200676_4ca982f2dd.jpg" />
+                                        </p>
+                                </section>
+                                <section>
+                                    <h3>My team was awesome - Backbone.js, Angular</h3>
+                                    <p>
+                                      Within a few hours they had live updating stats, a great design, and a deployable server.  What could I do?
+                                    </p>
+                                  </section>
+                                  <section data-state="map1">
+                                    <h3>I could make a map.</h3>
+                                    <div id="map1" class="world-map">
+                                      <div class="left-overlay"></div>
+                                      <div class="right-overlay"></div>
+                                    </div>
+                                  </section>
+                                  <section>
+                                    <pre class="stretch"> <code class="javascript">
+// Create map projection
+_projection = d3.geo.equirectangular()
+.scale(100)
+.translate([width / 2, height / 2])
+.precision(.1);
+                                    </code>
+                                    </pre>
+                                  </section>
+                                  <section>
+                                    <pre class="stretch"><code class="javascript">
+// Add the svg
+var svg = d3.select('#map').append('svg')
+  .attr('width', width)
+  .attr('height', height);
+                                    </code>
+                                    </pre>
+                                  </section>
+                                  <section>
+                                    <pre class="stretch"><code class="javascript">
+// Convert projection to a path
+var path = d3.geo.path()
+  .projection(_projection);
+                                    </code>
+                                    </pre>
+                                  </section>
+
+                                  <section>
+                                    <pre class="stretch"><code class="javascript">
+// Add the countries via topojson
+_g = svg.append('g');
+d3.json('js/world-110m.json', function(error, topology) {
+  _g.selectAll('path')
+  .data(topojson.object(topology, topology.objects.countries)
+  .geometries)
+  .enter()
+  .append('path')
+  .attr('d', path);
+                                    </code>
+                                    </pre>
+                                  </section>
+                                <section data-state="map2">
+                                  <h3>I could show logins on this map.</h3>
+                                  <div id="map2" class="world-map">
+                                    <div class="left-overlay"></div>
+                                    <div class="right-overlay"></div>
+                                  </div>
+                                </section>
+                                  <section>
+                                    <pre class="stretch"><code class="javascript">
+// Load data from JSON
+d3.json('cities_small.json', function(error, logins) {
+   if (logins.hasOwnProperty('stat') && logins.stat.fail === 'error') {
+       return false;
+   }
+                                    </code>
+                                    </pre>
+                                  </section>
+                                  <section>
+                                    <pre class="stretch"><code class="javascript">
+// Bind SVG circles to current data set
+var circles = overlay.selectAll('circle')
+    .data(logins, function(d) { return [d.lon, d.lat] });
+                                    </code>
+                                    </pre>
+                                  </section>
+                                  <section>
+                                    <pre class="stretch"> <code class="javascript">
+// Update the view
+circles.enter()
+    .append('circle')
+    .attr('cx', function(d) {
+        return _projection([d.lon, d.lat])[0];
+    })
+    .attr('cy', function(d) {
+        return _projection([d.lon, d.lat])[1];
+    })
+    .style('opacity', '.5')
+    .attr('r', 4)
+    .style('fill', '#77B849');
+                                    </code>
+                                    </pre>
+                                  </section>
+
+                                  <section>
+                                    <h3>Yawn.</h3>
+                                  </section>
+                                  <section>
+                                    <h3>Dashboards need to be COOL.</h3>
+                                  </section>
+                                  <section>
+                                    <h3>Ok, let's <em>Animate</em></h3>
+                                    <p>(D3 makes this crazy easy)</p>
+                                  </section>
+                                  <section data-state="map3">
+                                    <h3>Scorched Earth</h3>
+                                    <div id="map3" class="world-map">
+                                      <div class="left-overlay"></div>
+                                      <div class="right-overlay"></div>
+                                    </div>
+                                </section>
+                                  <section>
+                                    <pre class="stretch"><code class="javascript">
+// Update the view
+circles.enter()
+    .append('circle')
+    .attr('cx', function(d) {
+        return _projection([d.lon, d.lat])[0];
+    })
+    .attr('cy', function(d) {
+        return _projection([d.lon, d.lat])[1];
+    })
+    .attr('r', 15)
+    .style('fill', '#77B849').style('opacity', '0')
+     // Animate!
+    .transition()
+    .style('opacity', '.5')
+    .attr('r', 4)
+    .style('fill', '#77B849')
+    .duration(1000).delay(function(d, i) {
+        return i / logins.length * 60000});
+circles.exit().remove();
+                                    </code>
+                                    </pre>
+                                  </section>
+                                  <section>
+                                    <h3>Summary</h3>
+                                    <ul>
+                                      <li>Create a projection</li>
+                                      <li>Use data to bind data element as normal</li>
+                                      <li>Use the projection to draw data on map</li>
+                                      <li>Animate it with transition()</li>
+                                      <li>All this in ~50 lines of JavaScript</li>
+                                    </ul>
+                                  </section>
+                                  <section data-state="map4">
+                                    <h3>Questions?</h3>
+                                    <div id="map4" class="world-map">
+                                      <div class="left-overlay"></div>
+                                      <div class="right-overlay"></div>
+                                    </div>
+                                  </section>
+
+                        </div>
+
+                </div>
+
+                <script src="lib/js/head.min.js"></script>
+                <script src="js/reveal.min.js"></script>
+
+                <script>
+
+                        // Full list of configuration options available here:
+                        // https://github.com/hakimel/reveal.js#configuration
+                        Reveal.initialize({
+                                controls: true,
+                                progress: true,
+                                history: true,
+                                center: true,
+
+                                theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+                                transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+                                // Optional libraries used to extend on reveal.js
+                                dependencies: [
+                                        { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+                                        { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                                        { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                                        { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+                                        { src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+                                        { src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+                                ]
+                        });
+
+                </script>
+                <script src="js/d3.min.js"></script>
+                <script src="js/topojson.v0.min.js"></script>
+                <script src="maps.js"></script>
+                <script src="js/jquery-1.10.2.min.js"></script>
+                <script>
+                  var done = {};
+                  Reveal.addEventListener( 'map1', function() {
+                    if(! done.map1){
+                      _renderMap('#map1');
+                      done.map1 = true;
+                    }
+                  });
+                  Reveal.addEventListener( 'map2', function() {
+                    if(! done.map2){
+                      var state = _renderMap('#map2');
+                      _getLoginsStatic(state);
+                      done.map2 = true;
+                    }
+                  });
+                  Reveal.addEventListener( 'map3', function() {
+                    if(! done.map3){
+                      var state = _renderMap('#map3');
+                      _getLogins(state, 'cities_small.json');
+                      done.map3 = true;
+                    }
+                  });
+                  Reveal.addEventListener( 'map4', function() {
+                    if(! done.map4){
+                      var state = _renderMap('#map4');
+                      _getLogins(state, 'cities.json');
+                      done.map4 = true;
+                    }
+                  });
+
+                </script>
+        </body>
+</html>
